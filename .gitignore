@@ -1,0 +1,24 @@
+/ConvBPG/bin/
+/ConvBPG/[Oo]bj/
+
+
+# Visual Studio cache directory
+.vs/
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+#log files, for some plugins
+*.log
+
+#python bytecode cache, for some plugins.
+*.pyc
+
+
