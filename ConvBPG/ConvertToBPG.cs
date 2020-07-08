@@ -17,6 +17,8 @@ namespace ConvBPG
         public async Task<string> StartCommandAsync(ConvInfo convInfo) {
             //Processを非同期に実行
             using (Process process = GetProcess(convInfo)) {
+                if (process == null) { return null;  }
+
                 return await StartCommandAsync(process);
             }
         }
@@ -48,10 +50,15 @@ namespace ConvBPG
                 result = "";
                 await Task.Delay(0);
 
-                //プロセスの開始
-                started = process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
+                try {
+                    //プロセスの開始
+                    started = process.Start();
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+                }
+                catch (Exception e) {
+                    Console.WriteLine($"Exception={e}");
+                }
 
                 ctoken.Token.WaitHandle.WaitOne();
             }
@@ -60,7 +67,10 @@ namespace ConvBPG
         }
 
         Process GetProcess(ConvInfo convInfo) {
-            string bpgencPath = @"C:\Users\ePonta\Desktop\bpg-0.9.8-win64\bpgenc.exe";
+            string bpgencPath = @"C:\_APP\_Image\bpg-0.9.8-win64\bpgenc.exe";
+
+            if ((File.Exists(bpgencPath) == false)
+                || (File.Exists(convInfo.TargetFilePath) == false)) { return null; }
 
             var p = GetProcess(bpgencPath);
             string arg = "\"" + convInfo.TargetFilePath + "\" -o \"" + convInfo.GetBPG_Path() + "\"";

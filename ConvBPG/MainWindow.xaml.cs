@@ -86,7 +86,9 @@ namespace ConvBPG
             button.IsEnabled = false;
             clearButton.IsEnabled = false;
 
-            ConvertToBPG();
+            var t = Task.Run(() => {
+                ConvertToBPG();
+            });
         }
 
         private void clearButton_Click(object sender, RoutedEventArgs e) {
@@ -100,34 +102,54 @@ namespace ConvBPG
             var sem = new SemaphoreSlim(8); // 最大同時実行数
             var convTasks = targetFiles.ConvInfos.Select(async info => {
 
-                await sem.WaitAsync();
-                Debug.WriteLine($"ConvertToBPG Start: {info.TargetFilePath}");
+                var t = await Task.Run(async () => {
 
-                try {
-                    var conv = new ConvertToBPG();
-                    var cmdResult = await conv.StartCommandAsync(info);
+                    await sem.WaitAsync();
+                    Debug.WriteLine($"ConvertToBPG Start: {info.TargetFilePath}");
 
-                    info.UpdateConvedSize();
-                    dataGrid.Items.Refresh();
+                    try {
+                        var conv = new ConvertToBPG();
+                        var cmdResult = await conv.StartCommandAsync(info);
 
-                    Debug.WriteLine($"ConvertToBPG Refresh: {info.TargetFilePath}");
+                        /* Update Converted Size */
+                        info.UpdateConvedSize();
 
-                    return cmdResult;
-                }
-                finally {
-                    Debug.WriteLine($"ConvertToBPG Completed: {info.TargetFilePath}");
-                    sem.Release();
-                }
+                        /* Delete Target File */
+                        info.DeleteTargetFile();
+
+                        this.Dispatcher.Invoke((Action)(() => {
+                            dataGrid.Items.Refresh();
+                            Debug.WriteLine($"ConvertToBPG Refresh: {info.TargetFilePath}");
+                        }));
+
+                        return cmdResult;
+                    }
+                    finally {
+                        Debug.WriteLine($"ConvertToBPG Completed: {info.TargetFilePath}");
+                        sem.Release();
+                    }
+                });
+
+                return t;
             });
 
             try {
-                string[] htmls = await Task.WhenAll(convTasks);
+                string[] results = await Task.WhenAll(convTasks);
 
-                button.IsEnabled = true;
-                clearButton.IsEnabled = true;
+                foreach (var result in results) {
+                    Debug.WriteLine($"ConvertToBPG result: {result}");
+                }
+
+                this.Dispatcher.Invoke((Action)(() => {
+                    button.IsEnabled = true;
+                    clearButton.IsEnabled = true;
+
+                    MessageBox.Show($"Completed. {results.Length} Files.");
+                }));
+
             }
             catch (Exception e) {
-                Debug.WriteLine("ConvertToBPG : " + e);
+                Debug.WriteLine("ConvertToBPG Exception : " + e);
             }
 
         }

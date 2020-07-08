@@ -45,7 +45,6 @@ namespace ConvBPG
 
             var info = new ConvInfo();
             
-
             info.TargetFilePath = filePath;
             info.UpdateFileSize();
 
@@ -57,8 +56,7 @@ namespace ConvBPG
             var extension = Path.GetExtension(filePath);
 
             if (extension.Equals(".jpg")
-                || extension.Equals(".png")
-                || extension.Equals(".jp2")) {
+                || extension.Equals(".png")) {
 
                 return true;
             }

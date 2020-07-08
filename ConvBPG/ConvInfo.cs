@@ -9,7 +9,7 @@ namespace ConvBPG
         public string TargetFilePath { get; set; }
 
         public string FileSize { get; set; }
-        
+
         public string ConvFileSize { get; set; }
 
         public string Percentage { get; set; }
@@ -31,6 +31,13 @@ namespace ConvBPG
         }
 
         public void UpdateConvedSize() {
+
+            if ((File.Exists(TargetFilePath) == false)
+                || (File.Exists(GetBPG_Path()) == false)) {
+
+                return;
+            }
+
             long orgSize = new FileInfo(TargetFilePath).Length;
             long bpgSize = new FileInfo(GetBPG_Path()).Length;
 
@@ -54,6 +61,19 @@ namespace ConvBPG
                 "{0}{1}B",
                 size.ToString(specifier),
                 index < suffix.Length ? suffix[index] : "-");
+        }
+
+        public void DeleteTargetFile() {
+
+            if ((File.Exists(TargetFilePath) == false)
+                || (File.Exists(GetBPG_Path()) == false)){
+            
+                return;
+            }
+
+            File.Delete(TargetFilePath);
+
+            Message = "Completed.";
         }
 
     }
