@@ -18,6 +18,8 @@ namespace ConvBPG
 
         TargetFiles targetFiles = new TargetFiles();
 
+        CancellationTokenSource cts;
+
 
         public MainWindow() {
             InitializeComponent();
@@ -83,12 +85,27 @@ namespace ConvBPG
 
         private void button_Click(object sender, RoutedEventArgs e) {
 
-            button.IsEnabled = false;
-            clearButton.IsEnabled = false;
+            if (button.Content.Equals("Start")) {
 
-            var t = Task.Run(() => {
-                ConvertToBPG();
-            });
+                button.Content = "Stop";
+                clearButton.IsEnabled = false;
+
+                cts?.Dispose(); // Clean up old token source.
+                cts = new CancellationTokenSource();
+
+                var t = Task.Run(() => {
+                    ConvertToBPG();
+                });
+            }
+            else {
+                button.Content = "Start";
+                button.IsEnabled = false;
+                clearButton.IsEnabled = false;
+
+                Debug.WriteLine($"Cancel : ");
+                cts.Cancel();
+            }
+
         }
 
         private void clearButton_Click(object sender, RoutedEventArgs e) {
@@ -100,16 +117,28 @@ namespace ConvBPG
         async void ConvertToBPG() {
 
             var sem = new SemaphoreSlim(8); // 最大同時実行数
-            var convTasks = targetFiles.ConvInfos.Select(async info => {
 
+            var convTasks = targetFiles.ConvInfos.Select(async info => {
+                var token = cts.Token;
                 var t = await Task.Run(async () => {
 
-                    await sem.WaitAsync();
-                    Debug.WriteLine($"ConvertToBPG Start: {info.TargetFilePath}");
+                    string cmdResult = null;
 
                     try {
+                        /* Wait and Cancel */
+                        //Debug.WriteLine($"ConvertToBPG Run: {info.TargetFilePath}");
+                        await sem.WaitAsync();
+                        if (token.IsCancellationRequested) {
+                            Debug.WriteLine($"ConvertToBPG Cancel: {info.TargetFilePath}");
+                            cmdResult = "Canceled";
+                            info.Message = cmdResult;
+                            return cmdResult + info.TargetFilePath;
+                        }
+                        Debug.WriteLine($"ConvertToBPG Start: {info.TargetFilePath}");
+
+                        /* Start Command */
                         var conv = new ConvertToBPG();
-                        var cmdResult = await conv.StartCommandAsync(info);
+                        cmdResult = await conv.StartCommandAsync(info);
 
                         /* Update Converted Size */
                         info.UpdateConvedSize();
@@ -117,18 +146,18 @@ namespace ConvBPG
                         /* Delete Target File */
                         info.DeleteTargetFile();
 
-                        this.Dispatcher.Invoke((Action)(() => {
-                            dataGrid.Items.Refresh();
-                            Debug.WriteLine($"ConvertToBPG Refresh: {info.TargetFilePath}");
-                        }));
-
-                        return cmdResult;
+                        return cmdResult + info.TargetFilePath;
                     }
                     finally {
-                        Debug.WriteLine($"ConvertToBPG Completed: {info.TargetFilePath}");
+                        Debug.WriteLine($"ConvertToBPG Completed: {info.TargetFilePath} : {cmdResult}");
                         sem.Release();
+
+                        /* Refresh */
+                        this.Dispatcher.Invoke((Action)(() => {
+                            dataGrid.Items.Refresh();
+                        }));
                     }
-                });
+                }, token);
 
                 return t;
             });

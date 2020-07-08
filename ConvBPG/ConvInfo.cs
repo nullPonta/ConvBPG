@@ -35,6 +35,7 @@ namespace ConvBPG
             if ((File.Exists(TargetFilePath) == false)
                 || (File.Exists(GetBPG_Path()) == false)) {
 
+                ConvFileSize = "Error : Missing File !";
                 return;
             }
 
@@ -65,9 +66,13 @@ namespace ConvBPG
 
         public void DeleteTargetFile() {
 
+            var bpgPath = GetBPG_Path();
+
             if ((File.Exists(TargetFilePath) == false)
-                || (File.Exists(GetBPG_Path()) == false)){
-            
+                || (File.Exists(bpgPath) == false)
+                || (new FileInfo(bpgPath).Length <= 2048)) {
+
+                Message = "Error : Missing File ! or File Size Illegality !";
                 return;
             }
 

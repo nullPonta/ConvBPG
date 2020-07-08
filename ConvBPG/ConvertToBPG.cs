@@ -1,53 +1,53 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 
 namespace ConvBPG
 {
     class ConvertToBPG
     {
-        string result;
+        public string StandardOutputResult;
+        public string StandardErrorResult;
 
 
         public async Task<string> StartCommandAsync(ConvInfo convInfo) {
             //Processを非同期に実行
             using (Process process = GetProcess(convInfo)) {
-                if (process == null) { return null;  }
+                if (process == null) { return "Error : GetProcess Failure !";  }
 
                 return await StartCommandAsync(process);
             }
         }
 
         private async Task<string> StartCommandAsync(Process process) {
-            using (var ctoken = new CancellationTokenSource()) {
+            using (var cts = new CancellationTokenSource()) {
                 bool started = false;
 
                 process.Exited += (sender, args) => {
-                    Console.WriteLine($"exited");
-                    ctoken.Cancel();
+                    //Console.WriteLine($"exited");
+                    while( string.IsNullOrEmpty(StandardOutputResult) ||
+                        string.IsNullOrEmpty(StandardErrorResult) ) {
+
+                        Task.Delay(0);
+                    }
+
+                    cts.Cancel();
                 };
 
                 process.OutputDataReceived += (sender, args) => {
-                    if (!string.IsNullOrEmpty(args.Data)) {
-                        Console.WriteLine($"stdout={args.Data}");
-                        result += $"{args.Data}\n";
-                    }
+                    StandardOutputResult += $"OutputDataReceived : {args.Data}";
                 };
 
                 process.ErrorDataReceived += (sender, args) => {
-                    if (!string.IsNullOrEmpty(args.Data)) {
-                        Console.WriteLine($"stderr={args.Data}");
-                        result += $"Error : {args.Data}\n";
-                    }
+                    StandardErrorResult += $"ErrorDataReceived : {args.Data}";
                 };
 
                 //プロセスからの情報を受け取る変数の初期化
-                result = "";
+                StandardOutputResult = "";
+                StandardErrorResult = "";
                 await Task.Delay(0);
 
                 try {
@@ -60,10 +60,10 @@ namespace ConvBPG
                     Console.WriteLine($"Exception={e}");
                 }
 
-                ctoken.Token.WaitHandle.WaitOne();
+                cts.Token.WaitHandle.WaitOne();
             }
 
-            return result;
+            return StandardOutputResult + StandardErrorResult;
         }
 
         Process GetProcess(ConvInfo convInfo) {
