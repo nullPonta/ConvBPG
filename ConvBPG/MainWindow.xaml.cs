@@ -102,7 +102,7 @@ namespace ConvBPG
                 button.IsEnabled = false;
                 clearButton.IsEnabled = false;
 
-                Debug.WriteLine($"Cancel : ");
+                Debug.WriteLine($"button_Click : Stop");
                 cts.Cancel();
             }
 
@@ -170,6 +170,7 @@ namespace ConvBPG
                 }
 
                 this.Dispatcher.Invoke((Action)(() => {
+                    button.Content = "Start";
                     button.IsEnabled = true;
                     clearButton.IsEnabled = true;
 

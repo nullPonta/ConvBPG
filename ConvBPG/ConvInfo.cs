@@ -69,10 +69,17 @@ namespace ConvBPG
             var bpgPath = GetBPG_Path();
 
             if ((File.Exists(TargetFilePath) == false)
-                || (File.Exists(bpgPath) == false)
-                || (new FileInfo(bpgPath).Length <= 2048)) {
+                || (File.Exists(bpgPath) == false)) {
 
-                Message = "Error : Missing File ! or File Size Illegality !";
+                Message = "Error : Missing File !";
+                return;
+            }
+
+            if (new FileInfo(bpgPath).Length <= 1024) {
+
+                File.Delete(bpgPath);
+                Message = "Error : File Size Illegality !";
+
                 return;
             }
 
