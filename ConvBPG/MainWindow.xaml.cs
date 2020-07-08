@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-
+using System.Windows.Media;
 
 namespace ConvBPG
 {
@@ -117,9 +117,14 @@ namespace ConvBPG
         async void ConvertToBPG() {
 
             var sem = new SemaphoreSlim(8); // 最大同時実行数
+            int itemCount = 0;
 
             var convTasks = targetFiles.ConvInfos.Select(async info => {
                 var token = cts.Token;
+
+                itemCount++;
+                double offset = itemCount - 8;
+
                 var t = await Task.Run(async () => {
 
                     string cmdResult = null;
@@ -155,6 +160,8 @@ namespace ConvBPG
                         /* Refresh */
                         this.Dispatcher.Invoke((Action)(() => {
                             dataGrid.Items.Refresh();
+                            ScrollToVerticalOffset(offset);
+                            Debug.WriteLine($"offset : {offset}");
                         }));
                     }
                 }, token);
@@ -181,6 +188,18 @@ namespace ConvBPG
             catch (Exception e) {
                 Debug.WriteLine("ConvertToBPG Exception : " + e);
             }
+
+        }
+
+        void ScrollToVerticalOffset(double offset) {
+
+            if (dataGrid.Items.Count <= 0) { return; }
+
+            var border = VisualTreeHelper.GetChild(dataGrid, 0) as Decorator;
+            if (border == null) { return; }
+
+            var scroll = border.Child as ScrollViewer;
+            if (scroll != null) scroll.ScrollToVerticalOffset(offset);
 
         }
 
