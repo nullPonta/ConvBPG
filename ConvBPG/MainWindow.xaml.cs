@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,9 +16,7 @@ namespace ConvBPG
         TargetFiles targetFiles = new TargetFiles();
 
         SettingWindow settingWindow;
-
-        CancellationTokenSource cts;
-
+        
 
         public MainWindow() {
             InitializeComponent();
@@ -29,7 +24,7 @@ namespace ConvBPG
             dataGrid.ItemsSource = targetFiles.ConvInfos;
 
             /* Setting */
-            settingWindow = new SettingWindow(SetExePath);
+            settingWindow = new SettingWindow(SetExePath, SetDeleteOriginalFile);
         }
 
         private void textBox_TextChanged(object sender, TextChangedEventArgs e) {
@@ -95,11 +90,10 @@ namespace ConvBPG
                 startButton.Content = "Stop";
                 clearButton.IsEnabled = false;
 
-                cts?.Dispose(); // Clean up old token source.
-                cts = new CancellationTokenSource();
+                ConvertToBPG_Parallel.RefreshCancellationTokenSource();
 
                 var t = Task.Run(() => {
-                    ConvertToBPG_Parallel();
+                    ConvertToBPG_Parallel.Convert(targetFiles, this);
                 });
             }
             else {
@@ -108,7 +102,7 @@ namespace ConvBPG
                 clearButton.IsEnabled = false;
 
                 Debug.WriteLine($"button_Click : Stop");
-                cts.Cancel();
+                ConvertToBPG_Parallel.Cancel();
             }
 
         }
@@ -124,88 +118,7 @@ namespace ConvBPG
             settingWindow.Show();
         }
 
-        async void ConvertToBPG_Parallel() {
-
-            var cpuCount = Environment.ProcessorCount;
-            var sem = new SemaphoreSlim(cpuCount);
-            int itemCount = 0;
-
-            var convTasks = targetFiles.ConvInfos.Select(async info => {
-                var token = cts.Token;
-
-                itemCount++;
-                double offset = itemCount - cpuCount;
-
-                var t = await Task.Run(async () => {
-
-                    string cmdResult = null;
-
-                    try {
-                        /* Wait and Cancel */
-                        //Debug.WriteLine($"ConvertToBPG Run: {info.TargetFilePath}");
-                        await sem.WaitAsync();
-                        if (token.IsCancellationRequested) {
-                            Debug.WriteLine($"ConvertToBPG Cancel: {info.TargetFilePath}");
-                            cmdResult = "Canceled";
-                            info.Message = cmdResult;
-                            return cmdResult + info.TargetFilePath;
-                        }
-
-                        Debug.WriteLine($"ConvertToBPG Start: {info.TargetFilePath}");
-
-                        /* Start Command */
-                        var conv = new ConvertToBPG();
-                        cmdResult = await conv.StartCommandAsync(info);
-
-                        /* Update Converted Size */
-                        info.UpdateConvedSize();
-
-                        if (info.BpgencSuccess) {
-                            /* Delete Target File */
-                            info.DeleteTargetFile();
-                        }
-
-                        return cmdResult + info.TargetFilePath;
-                    }
-                    finally {
-                        Debug.WriteLine($"ConvertToBPG Completed: {info.TargetFilePath} : {cmdResult}");
-                        sem.Release();
-
-                        /* Refresh view */
-                        this.Dispatcher.Invoke((Action)(() => {
-                            dataGrid.Items.Refresh();
-                            ScrollToVerticalOffset(offset);
-                            Debug.WriteLine($"offset : {offset}");
-                        }));
-                    }
-                }, token);
-
-                return t;
-            });
-
-            try {
-                string[] results = await Task.WhenAll(convTasks);
-
-                foreach (var result in results) {
-                    Debug.WriteLine($"ConvertToBPG result: {result}");
-                }
-
-                this.Dispatcher.Invoke((Action)(() => {
-                    startButton.Content = "Start";
-                    startButton.IsEnabled = true;
-                    clearButton.IsEnabled = true;
-
-                    MessageBox.Show($"Completed. {results.Length} Files.");
-                }));
-
-            }
-            catch (Exception e) {
-                Debug.WriteLine("ConvertToBPG Exception : " + e);
-            }
-
-        }
-
-        void ScrollToVerticalOffset(double offset) {
+        public void ScrollToVerticalOffset(double offset) {
 
             if (dataGrid.Items.Count <= 0) { return; }
 
@@ -219,8 +132,14 @@ namespace ConvBPG
 
         void SetExePath(SettingWindow settingWindow, string bpgencExePath) {
 
-            settingWindow.SetBpgencExePath(bpgencExePath);
+            settingWindow.UpdateBpgencExePath(bpgencExePath);
             ConvertToBPG.bpgencPath = bpgencExePath;
+        }
+
+        void SetDeleteOriginalFile(SettingWindow settingWindow, bool isDeleteOriginalFile) {
+
+            ConvertToBPG_Parallel.isDeleteOriginalFile = isDeleteOriginalFile;
+            settingWindow.UpdateIsDeleteOriginalFile(isDeleteOriginalFile);
         }
 
     }

@@ -11,27 +11,41 @@ namespace ConvBPG
     {
         public delegate void SetExePath(SettingWindow settingWindow, string path);
 
+        public delegate void SetDeleteOriginalFile(SettingWindow settingWindow, bool isDeleteOriginalFile);
+
         SetExePath setExePathCallback;
 
-        string bpgencExePath;
+        SetDeleteOriginalFile setDeleteOriginalFileCallback;
 
 
-        public SettingWindow(SetExePath setExePathCallback) {
+        public SettingWindow(
+            SetExePath setExePathCallback,
+            SetDeleteOriginalFile setDeleteOriginalFileCallback) {
+            
             InitializeComponent();
 
             this.setExePathCallback = setExePathCallback;
+            this.setDeleteOriginalFileCallback = setDeleteOriginalFileCallback;
 
-            /* Load */
+            /* Load from Properties */
             var bpgencExePath = Properties.Settings.Default.bpgencExePath;
+            var isDeleteOriginalFile = Properties.Settings.Default.isDeleteOriginalFile;
 
+            /* Set by Callback */
             setExePathCallback(this, bpgencExePath);
+            setDeleteOriginalFileCallback(this, isDeleteOriginalFile);
         }
 
-        public void SetBpgencExePath(string bpgencExePath) {
-            this.bpgencExePath = bpgencExePath;
+        public void UpdateBpgencExePath(string bpgencExePath) {
             exeTextBox.Text = bpgencExePath;
 
             Properties.Settings.Default.bpgencExePath = bpgencExePath;
+        }
+
+        public void UpdateIsDeleteOriginalFile(bool isDeleteOriginalFile) {
+            isDeleteOriginalFileCheckBox.IsChecked = isDeleteOriginalFile;
+
+            Properties.Settings.Default.isDeleteOriginalFile = isDeleteOriginalFile;
         }
 
         private void SelectBpgencExeButton_Click(object sender, RoutedEventArgs e) {
@@ -48,6 +62,13 @@ namespace ConvBPG
             setExePathCallback(this, dialog.FileName);
         }
 
+        private void isDeleteOriginalFileCheckBox_Checked(object sender, RoutedEventArgs e) {
+
+            var isDeleteOriginalFile = isDeleteOriginalFileCheckBox.IsChecked.Value;
+
+            setDeleteOriginalFileCallback(this, isDeleteOriginalFile);
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             e.Cancel = true;
 
@@ -56,5 +77,6 @@ namespace ConvBPG
 
             this.Hide();
         }
+
     }
 }

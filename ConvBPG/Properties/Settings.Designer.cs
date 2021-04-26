@@ -34,5 +34,17 @@ namespace ConvBPG.Properties {
                 this["bpgencExePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool isDeleteOriginalFile {
+            get {
+                return ((bool)(this["isDeleteOriginalFile"]));
+            }
+            set {
+                this["isDeleteOriginalFile"] = value;
+            }
+        }
     }
 }

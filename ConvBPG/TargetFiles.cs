@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ConvBPG
 {
-    class TargetFiles
+    public class TargetFiles
     {
         public List<ConvInfo> ConvInfos = new List<ConvInfo>();
 
@@ -57,6 +57,7 @@ namespace ConvBPG
 
             if (extension.Equals(".jpg") ||
                 extension.Equals(".JPG") ||
+                extension.Equals(".bmp") ||
                 extension.Equals(".png")) {
 
                 return true;

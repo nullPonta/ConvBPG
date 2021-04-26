@@ -56,6 +56,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ConvertToBPG.cs" />
+    <Compile Include="ConvertToBPG_Parallel.cs" />
     <Compile Include="ConvInfo.cs" />
     <Compile Include="TargetFiles.cs" />
     <Compile Include="SettingWindow.xaml.cs">

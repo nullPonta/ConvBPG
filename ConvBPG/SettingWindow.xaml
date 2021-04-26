@@ -7,13 +7,10 @@
         mc:Ignorable="d"
         Title="Setting" Height="220" Width="600" Closing="Window_Closing">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="211*"/>
-            <ColumnDefinition Width="85*"/>
-        </Grid.ColumnDefinitions>
-        <TextBox x:Name="exeTextBox" HorizontalAlignment="Left" Height="32" Margin="20,56,0,0" TextWrapping="Wrap" Text="exe path" VerticalAlignment="Top" Width="540" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="exeTextBox" HorizontalAlignment="Left" Height="32" Margin="20,46,0,0" TextWrapping="Wrap" Text="exe path" VerticalAlignment="Top" Width="540"/>
         <Label x:Name="label" Content="Selected &quot;bpgenc.exe&quot; path" HorizontalAlignment="Left" Margin="20,20,0,0" VerticalAlignment="Top" Height="26" Width="155"/>
-        <Button x:Name="SelectButton" Content="Select" HorizontalAlignment="Left" Margin="18,93,0,0" VerticalAlignment="Top" Width="120" Height="32" Click="SelectBpgencExeButton_Click" Grid.Column="1"/>
+        <Button x:Name="SelectButton" Content="Select" HorizontalAlignment="Left" Margin="440,83,0,0" VerticalAlignment="Top" Width="120" Height="32" Click="SelectBpgencExeButton_Click"/>
+        <CheckBox x:Name="isDeleteOriginalFileCheckBox" Content="Delete Original File" Margin="20,130,20,0" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="isDeleteOriginalFileCheckBox_Checked"/>
 
     </Grid>
 </Window>

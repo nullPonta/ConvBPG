@@ -91,6 +91,10 @@ namespace ConvBPG
             Message = "Delete Original File Completed.";
         }
 
+        public void SetConvertCompletedMessage() {
+            Message = "Convert Completed.";
+        }
+
     }
 
 }
