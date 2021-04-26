@@ -126,14 +126,15 @@ namespace ConvBPG
 
         async void ConvertToBPG_Parallel() {
 
-            var sem = new SemaphoreSlim(8); // 最大同時実行数
+            var cpuCount = Environment.ProcessorCount;
+            var sem = new SemaphoreSlim(cpuCount);
             int itemCount = 0;
 
             var convTasks = targetFiles.ConvInfos.Select(async info => {
                 var token = cts.Token;
 
                 itemCount++;
-                double offset = itemCount - 8;
+                double offset = itemCount - cpuCount;
 
                 var t = await Task.Run(async () => {
 
