@@ -9,6 +9,8 @@ namespace ConvBPG
 {
     class ConvertToBPG
     {
+        public static string bpgencPath;
+
         public string StandardOutputResult;
         public string StandardErrorResult;
 
@@ -67,7 +69,6 @@ namespace ConvBPG
         }
 
         Process GetProcess(ConvInfo convInfo) {
-            string bpgencPath = @"C:\_APP\_Image\bpg-0.9.8-win64\bpgenc.exe";
 
             if ((File.Exists(bpgencPath) == false)
                 || (File.Exists(convInfo.TargetFilePath) == false)) { return null; }

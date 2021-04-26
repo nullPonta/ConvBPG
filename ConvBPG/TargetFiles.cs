@@ -55,8 +55,9 @@ namespace ConvBPG
 
             var extension = Path.GetExtension(filePath);
 
-            if (extension.Equals(".jpg")
-                || extension.Equals(".png")) {
+            if (extension.Equals(".jpg") ||
+                extension.Equals(".JPG") ||
+                extension.Equals(".png")) {
 
                 return true;
             }

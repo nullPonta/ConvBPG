@@ -18,6 +18,8 @@ namespace ConvBPG
 
         TargetFiles targetFiles = new TargetFiles();
 
+        SettingWindow settingWindow;
+
         CancellationTokenSource cts;
 
 
@@ -25,6 +27,9 @@ namespace ConvBPG
             InitializeComponent();
 
             dataGrid.ItemsSource = targetFiles.ConvInfos;
+
+            /* Setting */
+            settingWindow = new SettingWindow(SetExePath);
         }
 
         private void textBox_TextChanged(object sender, TextChangedEventArgs e) {
@@ -83,23 +88,23 @@ namespace ConvBPG
             }
         }
 
-        private void button_Click(object sender, RoutedEventArgs e) {
+        private void startButton_Click(object sender, RoutedEventArgs e) {
 
-            if (button.Content.Equals("Start")) {
+            if (startButton.Content.Equals("Start")) {
 
-                button.Content = "Stop";
+                startButton.Content = "Stop";
                 clearButton.IsEnabled = false;
 
                 cts?.Dispose(); // Clean up old token source.
                 cts = new CancellationTokenSource();
 
                 var t = Task.Run(() => {
-                    ConvertToBPG();
+                    ConvertToBPG_Parallel();
                 });
             }
             else {
-                button.Content = "Start";
-                button.IsEnabled = false;
+                startButton.Content = "Start";
+                startButton.IsEnabled = false;
                 clearButton.IsEnabled = false;
 
                 Debug.WriteLine($"button_Click : Stop");
@@ -114,7 +119,12 @@ namespace ConvBPG
             dataGrid.Items.Refresh();
         }
 
-        async void ConvertToBPG() {
+        private void settingButton_Click(object sender, RoutedEventArgs e) {
+
+            settingWindow.Show();
+        }
+
+        async void ConvertToBPG_Parallel() {
 
             var sem = new SemaphoreSlim(8); // 最大同時実行数
             int itemCount = 0;
@@ -157,7 +167,7 @@ namespace ConvBPG
                         Debug.WriteLine($"ConvertToBPG Completed: {info.TargetFilePath} : {cmdResult}");
                         sem.Release();
 
-                        /* Refresh */
+                        /* Refresh view */
                         this.Dispatcher.Invoke((Action)(() => {
                             dataGrid.Items.Refresh();
                             ScrollToVerticalOffset(offset);
@@ -177,8 +187,8 @@ namespace ConvBPG
                 }
 
                 this.Dispatcher.Invoke((Action)(() => {
-                    button.Content = "Start";
-                    button.IsEnabled = true;
+                    startButton.Content = "Start";
+                    startButton.IsEnabled = true;
                     clearButton.IsEnabled = true;
 
                     MessageBox.Show($"Completed. {results.Length} Files.");
@@ -201,6 +211,12 @@ namespace ConvBPG
             var scroll = border.Child as ScrollViewer;
             if (scroll != null) scroll.ScrollToVerticalOffset(offset);
 
+        }
+
+        void SetExePath(SettingWindow settingWindow, string bpgencExePath) {
+
+            settingWindow.SetBpgencExePath(bpgencExePath);
+            ConvertToBPG.bpgencPath = bpgencExePath;
         }
 
     }
