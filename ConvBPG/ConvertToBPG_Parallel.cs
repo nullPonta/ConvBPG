@@ -14,6 +14,8 @@ namespace ConvBPG
 
         public static bool isDeleteOriginalFile;
 
+        public static int quantizerValue;
+
 
         public static void RefreshCancellationTokenSource() {
             cts?.Dispose(); // Clean up old token source.
@@ -55,7 +57,7 @@ namespace ConvBPG
 
                         /* Start Command */
                         var conv = new ConvertToBPG();
-                        cmdResult = await conv.StartCommandAsync(info);
+                        cmdResult = await conv.StartCommandAsync(info, quantizerValue);
 
                         /* Update Converted Size */
                         info.UpdateConvedSize();

@@ -15,9 +15,9 @@ namespace ConvBPG
         public string StandardErrorResult;
 
 
-        public async Task<string> StartCommandAsync(ConvInfo convInfo) {
+        public async Task<string> StartCommandAsync(ConvInfo convInfo, int quantizerValue) {
             //Processを非同期に実行
-            using (Process process = GetProcess(convInfo)) {
+            using (Process process = GetProcess(convInfo, quantizerValue)) {
                 if (process == null) {
                     convInfo.BpgencSuccess = false;
                     convInfo.Message = "Could not start bpgenc !";
@@ -74,7 +74,7 @@ namespace ConvBPG
             return StandardOutputResult + StandardErrorResult;
         }
 
-        Process GetProcess(ConvInfo convInfo) {
+        Process GetProcess(ConvInfo convInfo, int quantizerValue) {
 
             if ((File.Exists(bpgencPath) == false)
                 || (File.Exists(convInfo.TargetFilePath) == false)) {
@@ -82,7 +82,11 @@ namespace ConvBPG
             }
 
             var p = GetProcess(bpgencPath);
+
             string arg = "\"" + convInfo.TargetFilePath + "\" -o \"" + convInfo.GetBPG_Path() + "\"";
+            arg += " -q " + quantizerValue.ToString();
+
+            Debug.WriteLine("arg : " + arg);
 
             p.StartInfo.Arguments = arg;
 

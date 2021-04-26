@@ -46,5 +46,17 @@ namespace ConvBPG.Properties {
                 this["isDeleteOriginalFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("29")]
+        public int quantizerValue {
+            get {
+                return ((int)(this["quantizerValue"]));
+            }
+            set {
+                this["quantizerValue"] = value;
+            }
+        }
     }
 }

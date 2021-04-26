@@ -24,7 +24,7 @@ namespace ConvBPG
             dataGrid.ItemsSource = targetFiles.ConvInfos;
 
             /* Setting */
-            settingWindow = new SettingWindow(SetExePath, SetDeleteOriginalFile);
+            settingWindow = new SettingWindow(SetExePath, SetDeleteOriginalFile, SetQuantizerValue);
         }
 
         private void textBox_TextChanged(object sender, TextChangedEventArgs e) {
@@ -140,6 +140,12 @@ namespace ConvBPG
 
             ConvertToBPG_Parallel.isDeleteOriginalFile = isDeleteOriginalFile;
             settingWindow.UpdateIsDeleteOriginalFile(isDeleteOriginalFile);
+        }
+
+        void SetQuantizerValue(SettingWindow settingWindow, int quantizerValue) {
+
+            ConvertToBPG_Parallel.quantizerValue = quantizerValue;
+            settingWindow.UpdateQuantizerValue(quantizerValue);
         }
 
     }
