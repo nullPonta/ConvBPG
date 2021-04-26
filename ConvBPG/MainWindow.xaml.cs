@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
+
 namespace ConvBPG
 {
     /// <summary>
@@ -15,7 +16,6 @@ namespace ConvBPG
     /// </summary>
     public partial class MainWindow : Window
     {
-
         TargetFiles targetFiles = new TargetFiles();
 
         SettingWindow settingWindow;
@@ -68,11 +68,11 @@ namespace ConvBPG
                     e.Column.DisplayIndex = 0;
                     break;
                 case "FileSize":
-                    e.Column.Header = "File Size";
+                    e.Column.Header = "Original File Size";
                     e.Column.DisplayIndex = 1;
                     break;
                 case "ConvFileSize":
-                    e.Column.Header = "Conv File Size";
+                    e.Column.Header = "Converted File Size";
                     e.Column.DisplayIndex = 2;
                     break;
                 case "Percentage":
@@ -150,6 +150,7 @@ namespace ConvBPG
                             info.Message = cmdResult;
                             return cmdResult + info.TargetFilePath;
                         }
+
                         Debug.WriteLine($"ConvertToBPG Start: {info.TargetFilePath}");
 
                         /* Start Command */
@@ -159,8 +160,10 @@ namespace ConvBPG
                         /* Update Converted Size */
                         info.UpdateConvedSize();
 
-                        /* Delete Target File */
-                        info.DeleteTargetFile();
+                        if (info.BpgencSuccess) {
+                            /* Delete Target File */
+                            info.DeleteTargetFile();
+                        }
 
                         return cmdResult + info.TargetFilePath;
                     }

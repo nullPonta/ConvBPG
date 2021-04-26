@@ -10,7 +10,7 @@
         <Button x:Name="startButton" Content="Start" HorizontalAlignment="Left" Margin="20,20,0,0" VerticalAlignment="Top" Width="120" Height="32" Click="startButton_Click"/>
         <Button x:Name="clearButton" Content="Clear" HorizontalAlignment="Left" Margin="160,20,0,0" VerticalAlignment="Top" Width="120" Height="32" Click="clearButton_Click"/>
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="32" Margin="327,20,0,0" TextWrapping="Wrap" Text="Drag and drop to here" VerticalAlignment="Top" Width="320" TextChanged="textBox_TextChanged" PreviewDragOver="textBox_PreviewDragOver_1" PreviewDrop="textBox_PreviewDrop" TextAlignment="Center"/>
-        <DataGrid x:Name="dataGrid" Margin="20,70,20,20" Grid.ColumnSpan="2" AutoGeneratingColumn="dataGrid_AutoGeneratingColumn"/>
         <Button x:Name="settingButton" Content="Setting" HorizontalAlignment="Left" Margin="652,20,0,0" VerticalAlignment="Top" Width="120" Height="32" Click="settingButton_Click"/>
+        <DataGrid x:Name="dataGrid" Margin="20,70,20,20" AutoGeneratingColumn="dataGrid_AutoGeneratingColumn"/>
     </Grid>
 </Window>

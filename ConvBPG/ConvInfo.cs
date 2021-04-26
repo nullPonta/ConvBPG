@@ -1,11 +1,11 @@
-﻿
+﻿using System.IO;
 
-using System.IO;
 
 namespace ConvBPG
 {
     public class ConvInfo
     {
+        /* for dataGrid */
         public string TargetFilePath { get; set; }
 
         public string FileSize { get; set; }
@@ -15,6 +15,9 @@ namespace ConvBPG
         public string Percentage { get; set; }
 
         public string Message { get; set; }
+
+        /*  */
+        public bool BpgencSuccess;
 
 
         public string GetBPG_Path() {
@@ -71,21 +74,21 @@ namespace ConvBPG
             if ((File.Exists(TargetFilePath) == false)
                 || (File.Exists(bpgPath) == false)) {
 
-                Message = "Error : Missing File !";
+                Message = "Error : Missing Delete Target File !";
                 return;
             }
 
             if (new FileInfo(bpgPath).Length <= 1024) {
 
                 File.Delete(bpgPath);
-                Message = "Error : File Size Illegality !";
+                Message = "Error : Delete Target File Size Illegality !";
 
                 return;
             }
 
             File.Delete(TargetFilePath);
 
-            Message = "Completed.";
+            Message = "Delete Original File Completed.";
         }
 
     }

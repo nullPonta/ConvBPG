@@ -18,13 +18,17 @@ namespace ConvBPG
         public async Task<string> StartCommandAsync(ConvInfo convInfo) {
             //Processを非同期に実行
             using (Process process = GetProcess(convInfo)) {
-                if (process == null) { return "Error : GetProcess Failure !";  }
+                if (process == null) {
+                    convInfo.BpgencSuccess = false;
+                    convInfo.Message = "Could not start bpgenc !";
+                    return "Error : GetProcess Failure !";
+                }
 
-                return await StartCommandAsync(process);
+                return await StartCommandAsync(process, convInfo);
             }
         }
 
-        private async Task<string> StartCommandAsync(Process process) {
+        private async Task<string> StartCommandAsync(Process process, ConvInfo convInfo) {
             using (var cts = new CancellationTokenSource()) {
                 bool started = false;
 
@@ -57,6 +61,8 @@ namespace ConvBPG
                     started = process.Start();
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
+
+                    convInfo.BpgencSuccess = true;
                 }
                 catch (Exception e) {
                     Console.WriteLine($"Exception={e}");
@@ -71,7 +77,9 @@ namespace ConvBPG
         Process GetProcess(ConvInfo convInfo) {
 
             if ((File.Exists(bpgencPath) == false)
-                || (File.Exists(convInfo.TargetFilePath) == false)) { return null; }
+                || (File.Exists(convInfo.TargetFilePath) == false)) {
+                return null;
+            }
 
             var p = GetProcess(bpgencPath);
             string arg = "\"" + convInfo.TargetFilePath + "\" -o \"" + convInfo.GetBPG_Path() + "\"";
