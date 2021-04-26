@@ -63,10 +63,11 @@ namespace ConvBPG
         }
 
         private void isDeleteOriginalFileCheckBox_Checked(object sender, RoutedEventArgs e) {
+            setDeleteOriginalFileCallback(this, isDeleteOriginalFileCheckBox.IsChecked.Value);
+        }
 
-            var isDeleteOriginalFile = isDeleteOriginalFileCheckBox.IsChecked.Value;
-
-            setDeleteOriginalFileCallback(this, isDeleteOriginalFile);
+        private void isDeleteOriginalFileCheckBox_Unchecked(object sender, RoutedEventArgs e) {
+            setDeleteOriginalFileCallback(this, isDeleteOriginalFileCheckBox.IsChecked.Value);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {

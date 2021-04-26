@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ConvBPG"
         mc:Ignorable="d"
-        Title="Setting" Height="220" Width="600" Closing="Window_Closing">
+        Title="Setting" Height="220" Width="600" Closing="Window_Closing" Topmost="True">
     <Grid>
         <TextBox x:Name="exeTextBox" HorizontalAlignment="Left" Height="32" Margin="20,46,0,0" TextWrapping="Wrap" Text="exe path" VerticalAlignment="Top" Width="540"/>
         <Label x:Name="label" Content="Selected &quot;bpgenc.exe&quot; path" HorizontalAlignment="Left" Margin="20,20,0,0" VerticalAlignment="Top" Height="26" Width="155"/>
         <Button x:Name="SelectButton" Content="Select" HorizontalAlignment="Left" Margin="440,83,0,0" VerticalAlignment="Top" Width="120" Height="32" Click="SelectBpgencExeButton_Click"/>
-        <CheckBox x:Name="isDeleteOriginalFileCheckBox" Content="Delete Original File" Margin="20,130,20,0" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="isDeleteOriginalFileCheckBox_Checked"/>
+        <CheckBox x:Name="isDeleteOriginalFileCheckBox" Content="Delete Original File" Margin="20,130,20,0" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="isDeleteOriginalFileCheckBox_Checked" Unchecked="isDeleteOriginalFileCheckBox_Unchecked"/>
 
     </Grid>
 </Window>
