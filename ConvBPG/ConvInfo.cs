@@ -86,6 +86,7 @@ namespace ConvBPG
                 return;
             }
 
+            /* Delete Original */
             File.Delete(TargetFilePath);
 
             Message = "Delete Original File Completed.";
